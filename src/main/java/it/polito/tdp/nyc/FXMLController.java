@@ -5,8 +5,11 @@
 package it.polito.tdp.nyc;
 
 import java.net.URL;
+
+import java.util.*;
 import java.util.ResourceBundle;
 import it.polito.tdp.nyc.model.Model;
+import it.polito.tdp.nyc.model.Quartiere;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -39,7 +42,7 @@ public class FXMLController {
     private ComboBox<String> cmbProvider; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbQuartiere"
-    private ComboBox<?> cmbQuartiere; // Value injected by FXMLLoader
+    private ComboBox<String> cmbQuartiere; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtMemoria"
     private TextField txtMemoria; // Value injected by FXMLLoader
@@ -59,10 +62,42 @@ public class FXMLController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	
+    	String provider = cmbProvider.getValue(); 
+    	if(provider == null) {
+    		txtResult.setText("Scegliere un provider dal menu a tendina!");
+    		return; 
+    	}else {
+    		this.model.creaGrafo(provider);
+    		txtResult.setText("Grafo Creato! \n");
+    		txtResult.appendText("- Vertici: "+ this.model.getNVertici()+"\n");
+    		txtResult.appendText("- Archi: "+ this.model.getNArchi()+"\n");
+    		
+    		List<Quartiere> citta = this.model.getVertici();  
+    		for(Quartiere q: citta) {
+    			cmbQuartiere.getItems().add(q.getCitta()); 
+    		}
+
+    	}
+    	
+    	
     }
 
     @FXML
     void doQuartieriAdiacenti(ActionEvent event) {
+    	
+    	String quartiere = cmbQuartiere.getValue(); 
+    	if(quartiere == null) {
+    		txtResult.setText("Scegliere un quartiere dal menu a tendina!");
+    		return; 
+    	}else {
+    		List<String> result = this.model.analizzaGrafo(quartiere); 
+    		txtResult.appendText("QUARTIERI ADIACENTI: \n");
+    		for(String s: result) {
+    			txtResult.appendText(s+ "\n");
+    			
+    		}
+    	}
+    	
     	
     }
 
@@ -87,6 +122,11 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	
+    	List<String> providers = this.model.getAllProvider(); 
+    	for(String s: providers) {
+    		cmbProvider.getItems().add(s); 
+    	}
     }
 
 }
